@@ -89,15 +89,19 @@ public class BasicItemController {
 
     /**
      * 우리가 만든 임의의 객체에 대해서는 @ModelAttribute 생략 가능.
+     * 수정 전 addItemV4의 치명적 문제점 : 상품을 추가하고 반환받은 뷰에서 새로고침하면 사용자가 마지막으로 행한 Post/add가 다시 실행되어
+     * 사용자의 의도와 다르게 추가했던 상품이 또 추가되는 현상이 발생한다.
+     * 해결방법 : PRG(Post/Redirect/Get) 패턴을 사용하여 사용자가 마지막으로 행한 행위를 Get요청으로 변경하여 무한으로 상품이 추가되는 것을 막는다.
      */
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItemV4(Item item){
-
-// 아무것도 안넣으면 모델 이름이 Item -> item으로 인식됨.
         itemRepository.save(item);
-//        model.addAttribute("item", item); // 자동 추가, 생략 가능
-
         return "basic/item";
+    }
+    @PostMapping("/add")
+    public String addItemV5(Item item){
+        itemRepository.save(item);
+        return "redirect:/basic/items/" + item.getId();
     }
 
     @GetMapping("/{itemId}/edit")
